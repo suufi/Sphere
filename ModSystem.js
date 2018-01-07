@@ -10,7 +10,7 @@ const TOKEN = "tokomoki";
 // Imports
 const roblox = require("roblox-js");
 const r = require("rethinkdbdash")({
-        db: "F3X"
+    db: "F3X"
 });
 
 // Express
@@ -44,41 +44,39 @@ bans.get("/", (req, res) => {
 */
 bans.post("/ban", async (req, res) => {
 
-        // Check if all body parameters have been provided
-        if (req.body.userId && req.body.admin && req.body.reason && req.body.token === TOKEN) {
+    // Check if all body parameters have been provided
+    if (req.body.userId && req.body.admin && req.body.reason && req.body.token === TOKEN) {
 
-                // Get the user being banned's username
-                var username = await roblox.getUsernameFromId(req.body.userId);
+        // Get the user being banned's username
+        var username = await roblox.getUsernameFromId(req.body.userId);
 
-                // Query the ban table for the userId provided
-                r.table("bans").getAll(parseInt(req.body.userId), {index: "userId"}).then(bans => {
+        // Query the ban table for the userId provided
+        r.table("bans").getAll(parseInt(req.body.userId), {index: "userId"}).then(bans => {
 
-                        // Check if user is not already banned
-                        if (bans.length === 0) {
+            // Check if user is not already banned
+            if (bans.length === 0) {
 
-                                // Insert to the bans table
-                                r.table("bans").insert({
-                                        userId: req.body.userId,
-                                        username: username,
-                                        admin: req.body.admin,
-                                        reason: req.body.reason,
-                                        timestamp: r.now()
-                                }).run().then(() => {
-                                        return res.send("The user has been banned.");
-                                });
+                // Insert to the bans table
+                r.table("bans").insert({
+                    userId: req.body.userId,
+                    username: username,
+                    admin: req.body.admin,
+                    reason: req.body.reason,
+                    timestamp: r.now()
+                }).run().then(() => {
+                    return res.send("The user has been banned.");
+                });
 
-                        } else {
-                                // Respond back that the person is already banned.
-                                return res.send("User is already banned.");
+            } else {
+                // Respond back that the person is already banned.
+                return res.send("User is already banned.");
 
-                        }
-                }).catch(console.error);
+            }
+        }).catch(console.error);
 
-        } else {
-
-            res.sendStatus(400);
-
-        }
+    } else {
+        res.sendStatus(400);
+    }
 
 });
 
@@ -91,34 +89,34 @@ bans.post("/ban", async (req, res) => {
 */
 bans.delete("/ban", (req, res) => {
 
-        // Check if all body parameters have been provided
-        if (req.body.userId && req.body.token === TOKEN) {
+    // Check if all body parameters have been provided
+    if (req.body.userId && req.body.token === TOKEN) {
 
-                // Query the ban table for the userId provided
-                r.table("bans").getAll(parseInt(req.body.userId), {index: "userId"}).then(ban => {
+        // Query the ban table for the userId provided
+        r.table("bans").getAll(parseInt(req.body.userId), {index: "userId"}).then(ban => {
 
-                        // Check if user is banned
-                        if (ban.length === 1) {
+            // Check if user is banned
+            if (ban.length === 1) {
 
-                                // Get and delete the document from bans table
-                                r.table("bans").get(ban[0].id).delete().run().then(() => {
+                // Get and delete the document from bans table
+                r.table("bans").get(ban[0].id).delete().run().then(() => {
 
-                                        // Respond back that the person is already banned.
-                                        return res.send("The user has been unbanned.");
+                    // Respond back that the person is already banned.
+                    return res.send("The user has been unbanned.");
 
-                                }).catch(console.error);
-
-                        } else {
-
-                                // Respond back that the user is not banned
-                                return res.send("The user is currently not banned.");
-
-                        }
                 }).catch(console.error);
 
-        } else {
-            res.sendStatus(400);
-        }
+            } else {
+
+                // Respond back that the user is not banned
+                return res.send("The user is currently not banned.");
+
+            }
+        }).catch(console.error);
+
+    } else {
+        res.sendStatus(400);
+    }
 });
 
 /*
@@ -129,25 +127,25 @@ bans.delete("/ban", (req, res) => {
 */
 bans.get("/check/:userId", (req, res) => {
 
-        // Check if all body parameters have been provided
-        if (req.params.userId && req.body.token === TOKEN) {
+    // Check if all body parameters have been provided
+    if (req.params.userId && req.body.token === TOKEN) {
 
-                // Query the ban table for the userId provided
-                r.table("bans").getAll(parseInt(req.params.userId), {index: "userId"}).then(ban => {
-                        
-                    // Check if user is banned
-                    if (ban.length === 1) {
-                            // Return the ban object
-                            return res.send(ban);
-                    } else {
-                            // Otherwise return false
-                            return res.send(false);
-                    }
-                }).catch(console.error);
-                
+        // Query the ban table for the userId provided
+        r.table("bans").getAll(parseInt(req.params.userId), {index: "userId"}).then(ban => {
+
+            // Check if user is banned
+            if (ban.length === 1) {
+                // Return the ban object
+                return res.send(ban);
             } else {
-                res.sendStatus(400);
-        }
+                // Otherwise return false
+                return res.send(false);
+            }
+        }).catch(console.error);
+
+    } else {
+        res.sendStatus(400);
+    }
 });
 
 /*
@@ -156,7 +154,7 @@ bans.get("/check/:userId", (req, res) => {
 *
 *   Returns an object if the user is banned, otherwise return false.
 */
-bans.post('/check/users', (req, res) => {
+bans.post("/check/users", (req, res) => {
 
     // Check if body was provided
     if (!req.body) return res.sendStatus(400);
@@ -166,13 +164,13 @@ bans.post('/check/users', (req, res) => {
     for (var index in req.body) {
         jobs.push(roblox.getUsernameFromId(req.body[index]));
     }
-    
+
     // Output to the console the users currently in the server
-    Promise.all(jobs).then(res => console.log('Users in server:', res));
-    
+    Promise.all(jobs).then(res => console.log("Users in server:", res));
+
     // Query the bans table with the userIds from req.body
-    r.table('bans').getAll(r.args(req.body), {index: 'userId'})('userId').run().then(result => {
-        
+    r.table("bans").getAll(r.args(req.body), {index: "userId"})("userId").run().then(result => {
+
         // Return back the results
         return res.send(result);
 
@@ -181,11 +179,11 @@ bans.post('/check/users', (req, res) => {
 });
 
 // Route /bans to the bans instance of express
-app.use('/bans', bans);
+app.use("/bans", bans);
 
 // Listen on port 9000
 app.listen(9000);
-console.log('Listening on port 9000…');
+console.log("Listening on port 9000…");
 
 // Handle on unhandledRejections
-process.on('unhandledRejection', err => console.error(`Uncaught Promise Error: \n${err.stack}`));
+process.on("unhandledRejection", err => console.error(`Uncaught Promise Error: \n${err.stack}`));
