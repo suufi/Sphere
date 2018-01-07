@@ -1,0 +1,33 @@
+{
+  "name": "Sphere",
+  "version": "1.0.0",
+  "description": "An Express-based API that can be used to moderate your ROBLOX game remotely.",
+  "main": "ModSystem.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/suufi/Sphere.git"
+  },
+  "keywords": [
+    "roblox",
+    "robloxlua",
+    "express",
+    "expressjs",
+    "rethinkdb",
+    "api"
+  ],
+  "author": "suufi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/suufi/Sphere/issues"
+  },
+  "homepage": "https://github.com/suufi/Sphere",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "rethinkdbdash": "^2.3.31",
+    "roblox-js": "^4.0.2"
+  }
+}
