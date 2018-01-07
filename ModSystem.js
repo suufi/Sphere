@@ -43,40 +43,38 @@ bans.get("/", (req, res) => {
 *   token used for verifying that the request is genuine.
 */
 bans.post("/ban", async (req, res) => {
+    
+    // Check if token was provided
+    if (!req.body.token !== TOKEN) return res.sendStatus(403);
 
-    // Check if all body parameters have been provided
-    if (req.body.userId && req.body.admin && req.body.reason && req.body.token === TOKEN) {
+    // Check if all body parameters were provided
+    if (!req.body.userId && !req.body.admin && !req.body.reason) return res.sendStatus(400);
 
-        // Get the user being banned's username
-        var username = await roblox.getUsernameFromId(req.body.userId);
+    // Get the user's username
+    var username = await roblox.getUsernameFromId(req.body.userId);
 
-        // Query the ban table for the userId provided
-        r.table("bans").getAll(parseInt(req.body.userId), {index: "userId"}).then(bans => {
+    // Query the ban table for the userId provided
+    r.table("bans").getAll(parseInt(req.body.userId), {index: "userId"}).then(bans => {
 
-            // Check if user is not already banned
-            if (bans.length === 0) {
+        // Check if user is not already banned
+        if (bans.length === 0) {
 
-                // Insert to the bans table
-                r.table("bans").insert({
-                    userId: req.body.userId,
-                    username: username,
-                    admin: req.body.admin,
-                    reason: req.body.reason,
-                    timestamp: r.now()
-                }).run().then(() => {
-                    return res.send("The user has been banned.");
-                });
+            // Insert to the bans table
+            r.table("bans").insert({
+                userId: req.body.userId,
+                username: username,
+                admin: req.body.admin,
+                reason: req.body.reason,
+                timestamp: r.now()
+            }).run().then(() => {
+                return res.send("The user has been banned.");
+            });
 
-            } else {
-                // Respond back that the person is already banned.
-                return res.send("User is already banned.");
-
-            }
-        }).catch(console.error);
-
-    } else {
-        res.sendStatus(400);
-    }
+        } else {
+            // Respond back that the person is already banned.
+            return res.send("User is already banned.");
+        }
+    }).catch(console.error);
 
 });
 
@@ -89,34 +87,33 @@ bans.post("/ban", async (req, res) => {
 */
 bans.delete("/ban", (req, res) => {
 
-    // Check if all body parameters have been provided
-    if (req.body.userId && req.body.token === TOKEN) {
+    // Check if token was provided
+    if (!req.body.token !== TOKEN) return res.sendStatus(403);
 
-        // Query the ban table for the userId provided
-        r.table("bans").getAll(parseInt(req.body.userId), {index: "userId"}).then(ban => {
+    // Check if userId was provided in body
+    if (!req.body.userId) return res.sendStatus(400);
 
-            // Check if user is banned
-            if (ban.length === 1) {
+    // Query the ban table for the userId provided
+    r.table("bans").getAll(parseInt(req.body.userId), {index: "userId"}).then(ban => {
 
-                // Get and delete the document from bans table
-                r.table("bans").get(ban[0].id).delete().run().then(() => {
+        // Check if user is banned
+        if (ban.length === 1) {
 
-                    // Respond back that the person is already banned.
-                    return res.send("The user has been unbanned.");
+            // Get and delete the document from bans table
+            r.table("bans").get(ban[0].id).delete().run().then(() => {
 
-                }).catch(console.error);
+                // Respond back that the person is already banned.
+                return res.send("The user has been unbanned.");
 
-            } else {
+            }).catch(console.error);
 
-                // Respond back that the user is not banned
-                return res.send("The user is currently not banned.");
+        } else {
 
-            }
-        }).catch(console.error);
+            // Respond back that the user is not banned
+            return res.send("The user is currently not banned.");
 
-    } else {
-        res.sendStatus(400);
-    }
+        }
+    }).catch(console.error);
 });
 
 /*
@@ -127,49 +124,51 @@ bans.delete("/ban", (req, res) => {
 */
 bans.get("/check/:userId", (req, res) => {
 
-    // Check if all body parameters have been provided
-    if (req.params.userId && req.body.token === TOKEN) {
+    // Check if token was provided
+    if (!req.body.token !== TOKEN) return res.sendStatus(403);
 
-        // Query the ban table for the userId provided
-        r.table("bans").getAll(parseInt(req.params.userId), {index: "userId"}).then(ban => {
+    // Check if userId param was provided
+    if (!req.params.userId) return res.sendStatus(400);
 
-            // Check if user is banned
-            if (ban.length === 1) {
-                // Return the ban object
-                return res.send(ban);
-            } else {
-                // Otherwise return false
-                return res.send(false);
-            }
-        }).catch(console.error);
+    // Query the ban table for the userId provided
+    r.table("bans").getAll(parseInt(req.params.userId), {index: "userId"}).then(ban => {
 
-    } else {
-        res.sendStatus(400);
-    }
+        // Check if user is banned
+        if (ban.length === 1) {
+            // Return the ban object
+            return res.send(ban);
+        } else {
+            // Otherwise return false
+           return res.send(false);
+        }
+    }).catch(console.error);
 });
 
 /*
 *   POST /bans/check/users
-*   Body [Array userIDs]
+*   Body [Array players], token
 *
 *   Returns an object if the user is banned, otherwise return false.
 */
 bans.post("/check/users", (req, res) => {
 
-    // Check if body was provided
-    if (!req.body) return res.sendStatus(400);
+    // Check if token was provided
+    if (!req.body.token !== TOKEN) return res.sendStatus(403);
+
+    // Check if players were provided
+    if (!req.body.players) return res.sendStatus(400);
 
     // Push the promise that gets the username of the user from their ID to jobs
     var jobs = [];
-    for (var index in req.body) {
-        jobs.push(roblox.getUsernameFromId(req.body[index]));
+    for (var index in req.body.players) {
+        jobs.push(roblox.getUsernameFromId(req.body.players[index]));
     }
 
     // Output to the console the users currently in the server
     Promise.all(jobs).then(res => console.log("Users in server:", res));
 
     // Query the bans table with the userIds from req.body
-    r.table("bans").getAll(r.args(req.body), {index: "userId"})("userId").run().then(result => {
+    r.table("bans").getAll(r.args(req.body.players), {index: "userId"})("userId").run().then(result => {
 
         // Return back the results
         return res.send(result);
