@@ -1,0 +1,21 @@
+{
+  "name": "SphereBot",
+  "version": "1.0.0",
+  "description": "Sphere, a simple Discord bot structured off of the Sphere API.",
+  "main": "Sphere.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.2.1",
+    "discord.js-commando": "^0.9.0",
+    "moment": "^2.20.1",
+    "moment-duration-format": "^2.1.1",
+    "rethinkdbdash": "^2.3.31",
+    "roblox-js": "^4.0.2",
+    "sqlite": "^2.9.0",
+    "winston": "^2.4.0"
+  }
+}

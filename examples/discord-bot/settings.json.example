@@ -1,0 +1,9 @@
+{
+	"TOKEN": "token",
+	"OWNER": "owner",
+	"COMMAND_PREFIX": ">",
+	"API_TOKEN": "api_token",
+	"BASEURL": "baseURL",
+    "USERNAME": "username",
+    "PASSWORD": "password"
+}
