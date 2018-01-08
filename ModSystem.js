@@ -67,7 +67,7 @@ bans.post("/ban", async (req, res) => {
                 reason: req.body.reason,
                 timestamp: r.now()
             }).run().then(() => {
-                return res.send("The user has been banned.");
+                return res.send(200);
             });
 
         } else {
