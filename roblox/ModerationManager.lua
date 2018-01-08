@@ -1,5 +1,5 @@
-local Try = require(script.Parent.TryLibrary)
-local BaseURL = "http://server.suufi.xyz:9000";
+local Try = require(script.TryLibrary)
+local BaseURL = "baseURL";
 
 while wait(1) do
 
